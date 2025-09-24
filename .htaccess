@@ -1,0 +1,57 @@
+# Use PHP5.6 as default
+#AddHandler application/x-httpd-php56 .php
+# Use PHP5.6 Single php.ini as default
+#AddHandler application/x-httpd-phpbetas .php
+
+Options -Indexes
+
+RewriteEngine On
+
+RewriteCond %{REQUEST_URI} !(/$|\.) 
+RewriteRule (.*) %{REQUEST_URI}/ [R=301,L] 
+
+### REMOVE FILE EXTENSION ( .php )
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)/$ $1.php
+
+### TEMPLATE RENAMING FOLDER
+RewriteRule ^public/css/(.*) /template/style/$1 [NC,L]
+RewriteRule ^public/img/(.*) /template/image/$1 [NC,L]
+RewriteRule ^public/js/(.*) /template/javascript/$1 [NC,L]
+RewriteRule ^public/scss/(.*) /template/scss/$1 [NC,L]
+RewriteRule ^public/lib/(.*) /template/jquery/$1 [NC,L]
+RewriteRule ^public/skins/(.*) /template/skins/$1 [NC,L]
+RewriteRule ^public/font/(.*) /template/fonts/$1 [NC,L]
+
+### UPLOAD
+RewriteRule ^file/(.*) /upload/$1 [NC,L]
+
+### ACCOUNT
+RewriteRule ^login/$ index.php?controller=account&view=login [NC,L]
+RewriteRule ^logout/$ index.php?controller=account&view=logout [NC,L]
+
+### COCAF
+RewriteRule ^api/cocaf/validate/?$ index.php?controller=api&view=validate [NC,L]
+
+### UAT
+RewriteRule ^uat/api/cocaf/validate/?$ index.php?controller=uat&view=validate [NC,L]
+
+### DEFAULT
+RewriteRule ^([a-z]+)/([^/]+)/?$ index.php?controller=$1&view=$2 [QSA] 
+RewriteRule ^([a-z]+)/?$ index.php?controller=$1&view=index [QSA]
+
+### ERROR PAGES
+RewriteRule ^bad-request/$ index.php?controller=page&view=error400 [QSA]
+RewriteRule ^unauthorized/$ index.php?controller=page&view=error401 [QSA]
+RewriteRule ^forbidden/$ index.php?controller=page&view=error403 [QSA]
+RewriteRule ^page-not-found/$ index.php?controller=page&view=error404 [QSA]
+RewriteRule ^internal-server-error/$ index.php?controller=page&view=error500 [QSA]
+RewriteRule ^coming-soon/$ index.php?controller=page&view=coming-soon [QSA]
+RewriteRule ^under-maintenance/$ index.php?controller=page&view=under-maintenance [QSA]
+
+ErrorDocument 400 /bad-request/
+ErrorDocument 401 /unauthorized/
+ErrorDocument 403 /forbidden/
+ErrorDocument 404 /page-not-found/
+ErrorDocument 500 /internal-server-error/
