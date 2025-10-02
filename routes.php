@@ -30,15 +30,31 @@
 
         'page'          => ['home', 'error400', 'error401', 'error403', 'error404', 'error500'],
 
+        'maintenance'          => ['health'],
+
     );
+    $json_controllers = ['maintenance'];
+    $json_suffix      = '_json';
 
     if(array_key_exists($controller, $controllers)){
         if(in_array($view, $controllers[$controller])){
             call($controller, $view);
+        if (in_array($controller, $json_controllers) || substr($view, -strlen($json_suffix)) === $json_suffix
+        ) {
+            exit;
+        }
         }else{
             call('page', 'error404');
         }
     }else{
         call('page', 'error404');
     }
+    error_log("DEBUG: controller=$controller, view=$view, uri=" . $_SERVER['REQUEST_URI']);
+    if ($_SERVER['REQUEST_URI'] === '/maintenance/health' || $_SERVER['REQUEST_URI'] === '/maintenance/health/') {
+        require_once('app/controllers/MaintenanceController.php');
+        $controller = new MaintenanceController();
+        $controller->health();
+        exit; // absolutely stop here
+    }
+
 ?>  
